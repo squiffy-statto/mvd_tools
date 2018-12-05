@@ -1,21 +1,15 @@
 /*******************************************************************************
-|
-| Program Name:   mvd_tools_example1.sas
-|
-| Program Version: 1.0
-|
-| Program Purpose: Examples of using FCMP Functions from mvd_tools.
-| 
-| SAS Version:  9.4
-|
-| Created By:   Thomas Drury: tad66240
-| Date:         28NOV18 
-|
+| Name       : mvd_tools_example1.sas
+| Purpose    : Examples of using FCMP Functions from mvd_tools.
+| SAS Version: 9.4
+| Created By : Thomas Drury
+| Date       : 28NOV18 
 ********************************************************************************/;
 
-*** INCLUDE MACROS AND FUNCTIONS ***;
-%include "/hpawrk/tad66240/repository/mvd_tools/mvd_tools.sas";
-*%include "\\us1salx00678.corpnet2.com\hpawrk\tad66240\repository\sim_tools\sim_tools.sas";
+*** INCLUDE TOOLS CODE ***;
+options source2;
+filename mvd url "https://raw.githubusercontent.com/squiffy-statto/mvd_tools/master/mvd_tools.sas";
+%include mvd;
 
 options cmplib=work.functions;
 

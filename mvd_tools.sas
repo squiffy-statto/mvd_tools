@@ -1,23 +1,12 @@
 /*******************************************************************************
-|
-| Program Name:    mvd_tools.sas
-|
-| Program Version: 1.0
-|
-| Program Purpose: Creates macros and FCMP Functions to calculate PDFs, CDFs
-|                  and simulate values from n-variate gauss and T distributions
-|                  these can be used for joint simulation and likelihood 
-|                  creation.
-| 
-| SAS Version:  9.4
-|
-| Created By:   Thomas Drury: tad66240
-| Date:         28NOV18 
-|
-|--------------------------------------------------------------------------------
-| Change Log: (Codes: OC = Original Code, BF = Bug Fix, UP = Update)
-| 1 TD: 21NOV18: OC: with Gauss functions.
-|
+| Name       : mvd_tools.sas
+| Purpose    : Creates macros and FCMP Functions to calculate PDFs, CDFs
+|              and simulate values from n-variate gauss and T distributions
+|              these can be used for joint simulation and likelihood 
+|              creation.
+| SAS Version: 9.4
+| Created By : Thomas Drury
+| Date       : 28NOV18 
 |--------------------------------------------------------------------------------
 | Macros List: See corresponding FCMP Function
 |--------------------------------------------------------------------------------
@@ -29,7 +18,6 @@
 | Arguments: y [REQ] = 1 Dim array with mv variables to populate
 |            m [REQ] = 1 Dim array with mv mean values
 |            v [REQ] = 2 Dim array with variance covariance matrix  
-|
 ***********************************************************************************/;
 
 proc fcmp outlib = work.functions.sim_tools;
