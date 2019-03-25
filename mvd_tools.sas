@@ -20,7 +20,7 @@
 |            v [REQ] = 2 Dim array with variance covariance matrix  
 ***********************************************************************************/;
 
-proc fcmp outlib = work.functions.sim_tools;
+proc fcmp outlib = work.functions.mvd_tools;
 
   subroutine sim_mvn(y[*],m[*],v[*,*]);   
      outargs y;
@@ -63,6 +63,67 @@ proc fcmp outlib = work.functions.sim_tools;
        end;
      end;
   endsub;
+
+
+  subroutine sim_mvt(y[*],m[*],v[*,*],d);   
+     outargs y;
+
+     ydim1 = dim1(y); 
+     mdim1 = dim1(m);
+     vdim1 = dim1(v);
+     vdim2 = dim2(v);
+
+     if not ( ydim1 = mdim1 = vdim1 = vdim2 ) then do;
+       msg1 = "ER"||upcase("ror:(FCMP):")||"The Function SIM_MVT does not have matching array sizes.";
+       msg2 = "ER"||upcase("ror:(FCMP): Dimensions:");
+       put msg1;
+       put msg2 ydim1= mdim1= vdim1= vdim2=;
+     end;
+     else do;
+
+       n = ydim1;
+
+       array zvec [1,1] / nosymbols;     
+       array mvec [1,1] / nosymbols;
+       array vmat [1,1] / nosymbols;
+       array wval [1,1] / nosymbols;
+
+       call dynamic_array(zvec,n,1);     
+       call dynamic_array(mvec,n,1);
+       call dynamic_array(vmat,n,n);
+
+       do ii = 1 to n;
+         zvec[ii,1] = rand("NORMAL",0,1);
+         mvec[ii,1] = m[ii];
+         do jj = 1 to n;
+           vmat[ii,jj] = v[ii,jj];
+         end;
+       end;
+
+       wval[1,1] = sqrt(d/rand("CHISQ",d)); 
+
+       array smat[1,1] / nosymbols;
+       array sxz [1,1] / nosymbols;
+       array szw [1,1] / nosymbols;
+       array mvt [1,1] / nosymbols;
+
+       call dynamic_array(smat,n,n);     
+       call dynamic_array(sxz,n,1);
+       call dynamic_array(szw,n,1);
+       call dynamic_array(mvt,n,1);
+
+       call chol(vmat,smat);
+       call mult(smat,zvec,sxz);
+       call mult(sxz,wval,szw);
+       call addmatrix(mvec,szw,mvt);
+
+       do ii = 1 to n;
+         y[ii] = mvt[ii,1];
+       end;
+
+     end;
+  endsub;
+
 run;
 quit;
 
