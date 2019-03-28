@@ -13,7 +13,22 @@ filename mvd url "https://raw.githubusercontent.com/squiffy-statto/mvd_tools/mas
 
 options cmplib=work.functions;
 
-data mvn_data;
+
+*** NON POS DEF ERROR ***;
+data mvn_data1;
+   call streaminit(123456);
+   array y[2] y1-y2;
+   array m[2]   _temporary_ (1 2);
+   array r[2,2] _temporary_ (1.00 2.00
+                             2.00 1.00);
+   do sim = 1 to 10;
+     call sim_mvn(y,m,r);
+     output;
+   end;
+run;
+
+*** STANDARD EXAMPLE ***;
+data mvn_data2;
    call streaminit(123456);
    array y[8] y1-y8;
    array m[8]   _temporary_ (1 2 3 4 5 6 7 8);
@@ -32,14 +47,14 @@ data mvn_data;
 run;
 
 ods html;
-proc corr data = mvn_data;
+proc corr data = mvn_data2;
   var y1-y8;
 run;
 ods html close;
 
 
 proc datasets lib = work noprint;
-  delete mvn_data;
+  delete mvn_data:;
 run;
 quit;
 

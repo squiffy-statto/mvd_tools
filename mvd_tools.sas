@@ -1,6 +1,6 @@
 /*******************************************************************************
 | Name       : mvd_tools.sas
-| Purpose    : Creates macros and FCMP Functions to calculate PDFs, CDFs
+| Purpose    : Creates FCMP Functions to calculate PDFs, CDFs
 |              and simulate values from n-variate gauss and T distributions
 |              these can be used for joint simulation and likelihood 
 |              creation.
@@ -8,16 +8,20 @@
 | Created By : Thomas Drury
 | Date       : 28NOV18 
 |--------------------------------------------------------------------------------
-| Macros List: See corresponding FCMP Function
-|--------------------------------------------------------------------------------
-|--------------------------------------------------------------------------------
 | FCMP Functions and Call Routine List:
 |--------------------------------------------------------------------------------
-| Name     : mvn_sim(y,m,v) 
+| Name     : sim_mvn(y,m,v) 
 | Purpose  : Simulates multivariate normal values  
 | Arguments: y [REQ] = 1 Dim array with mv variables to populate
 |            m [REQ] = 1 Dim array with mv mean values
 |            v [REQ] = 2 Dim array with variance covariance matrix  
+|
+| Name     : sim_mvt(y,m,v,d) 
+| Purpose  : Simulates multivariate normal values  
+| Arguments: y [REQ] = 1 Dim array with mv variables to populate
+|            m [REQ] = 1 Dim array with mv mean values
+|            v [REQ] = 2 Dim array with variance covariance matrix  
+|            d [REQ] = Degrees of freedom for MVT distribution
 ***********************************************************************************/;
 
 proc fcmp outlib = work.functions.mvd_tools;
@@ -72,7 +76,6 @@ proc fcmp outlib = work.functions.mvd_tools;
      mdim1 = dim1(m);
      vdim1 = dim1(v);
      vdim2 = dim2(v);
-
      if not ( ydim1 = mdim1 = vdim1 = vdim2 ) then do;
        msg1 = "ER"||upcase("ror:(FCMP):")||"The Function SIM_MVT does not have matching array sizes.";
        msg2 = "ER"||upcase("ror:(FCMP): Dimensions:");
@@ -82,12 +85,10 @@ proc fcmp outlib = work.functions.mvd_tools;
      else do;
 
        n = ydim1;
-
        array zvec [1,1] / nosymbols;     
        array mvec [1,1] / nosymbols;
        array vmat [1,1] / nosymbols;
        array wval [1,1] / nosymbols;
-
        call dynamic_array(zvec,n,1);     
        call dynamic_array(mvec,n,1);
        call dynamic_array(vmat,n,n);
@@ -106,19 +107,26 @@ proc fcmp outlib = work.functions.mvd_tools;
        array sxz [1,1] / nosymbols;
        array szw [1,1] / nosymbols;
        array mvt [1,1] / nosymbols;
-
        call dynamic_array(smat,n,n);     
        call dynamic_array(sxz,n,1);
        call dynamic_array(szw,n,1);
        call dynamic_array(mvt,n,1);
 
-       call chol(vmat,smat);
-       call mult(smat,zvec,sxz);
-       call mult(sxz,wval,szw);
-       call addmatrix(mvec,szw,mvt);
-
-       do ii = 1 to n;
-         y[ii] = mvt[ii,1];
+       call det(vmat,detv);
+       if detv le 0 then do;
+         msg1 = "ER"||upcase("ror:(FCMP):")||"The input array v[.,.] is not positive definite.";
+         msg2 = "ER"||upcase("ror:(FCMP): Array:");
+         put msg1;
+         put msg2 v[*]=;
+       end;
+       else do;
+         call chol(vmat,smat);
+         call mult(smat,zvec,sxz);
+         call mult(sxz,wval,szw);
+         call addmatrix(mvec,szw,mvt);
+         do ii = 1 to n;
+           y[ii] = mvt[ii,1];
+         end;
        end;
 
      end;
