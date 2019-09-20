@@ -61,7 +61,7 @@ data tvn2;
   by i j;
 run;
 
-proc print data = tvn;
+proc print data = tvn2;
 run;
 
 
