@@ -120,7 +120,7 @@ proc fcmp outlib = work.functions.mvd_tools;
 
       if (n < ydim1) then do;
         msg1 = "NO"||upcase("te:(FCMP):")||"Partially missing vectors supplied to function MVN_PDF.";
-        msg2 = "NO"||upcase("te:(FCMP):")||"PDF_MVN will return pdf values using vectors constructed with non missing values.");
+        msg2 = "NO"||upcase("te:(FCMP):")||"PDF_MVN will return pdf values using vectors constructed with non missing values.";
         put msg1;
         put msg2 udim1= odim1= odim2=;
       end;
