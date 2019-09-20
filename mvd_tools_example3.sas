@@ -9,6 +9,7 @@
 *** INCLUDE TOOLS CODE ***;
 options source2;
 filename mvd url "https://raw.githubusercontent.com/squiffy-statto/mvd_tools/master/mvd_tools.sas";
+%include mvd;
 options cmplib=work.functions;
 
 

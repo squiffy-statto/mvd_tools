@@ -108,7 +108,7 @@ proc fcmp outlib = work.functions.mvd_tools;
       msg1 = "ER"||upcase("ror:(FCMP):")||"The Function MVN_PDF does not have matching array sizes.";
       msg2 = "ER"||upcase("ror:(FCMP): Dimensions:");
       put msg1;
-      put msg2 udim1= odim1= odim2=;
+      put msg2 ydim1= mdim1= vdim1= vdim2=;
       pdf = .e;
     end;
     else do;
@@ -122,7 +122,7 @@ proc fcmp outlib = work.functions.mvd_tools;
         msg1 = "NO"||upcase("te:(FCMP):")||"Partially missing vectors supplied to function MVN_PDF.";
         msg2 = "NO"||upcase("te:(FCMP):")||"PDF_MVN will return pdf values using vectors constructed with non missing values.";
         put msg1;
-        put msg2 udim1= odim1= odim2=;
+        put msg2;
       end;
 
       array loc[1,1] / nosymbols;
