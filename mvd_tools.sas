@@ -1,7 +1,7 @@
 /*******************************************************************************
 | Name       : mvd_tools.sas
 | Purpose    : Creates FCMP Functions to calculate PDFs, CDFs
-|              and simulate values from n-variate gauss and T distributions
+|              and simulate values from n-variate Gauss and T distributions
 |              these can be used for joint simulation and likelihood 
 |              creation.
 | SAS Version: 9.4
@@ -10,23 +10,53 @@
 |--------------------------------------------------------------------------------
 | FCMP Functions and Call Routine List:
 |--------------------------------------------------------------------------------
-| Name     : sim_mvn(y,m,v) 
+|
+| Multivariate Normal Functions and Call Routines
+|------------------------------------------------
+| Name     : rand_mvn(y,m,v) 
 | Purpose  : Simulates multivariate normal values  
 | Arguments: y [REQ] = 1 Dim array with mv variables to populate
 |            m [REQ] = 1 Dim array with mv mean values
 |            v [REQ] = 2 Dim array with variance covariance matrix  
 |
-| Name     : sim_mvt(y,m,v,d) 
+| Name     : pdf_mvn(y,m,v) 
+| Purpose  : Returns multivariate normal density values  
+| Arguments: y [REQ] = 1 Dim array with mv data values
+|            m [REQ] = 1 Dim array with mv mean values
+|            v [REQ] = 2 Dim array with variance covariance matrix  
+|
+| Name     : cond_mu_mvn(y,m,v) 
+| Purpose  : Creates conditional mean vector for MVN.  
+| Arguments: y [REQ] = 1 Dim array with mv values to condition on
+|            m [REQ] = 1 Dim array with full mv mean values
+|            v [REQ] = 2 Dim array with full variance covariance matrix  
+|
+| Name     : cond_vc_mvn(y,m,v) 
+| Purpose  : Creates conditional vc matrix for MVN.  
+| Arguments: y [REQ] = 1 Dim array with mv values to condition on
+|            m [REQ] = 1 Dim array with full mv mean values
+|            v [REQ] = 2 Dim array with full variance covariance matrix  
+|
+|
+| Multivariate T Functions and Call Routines
+|-------------------------------------------
+| Name     : rand_mvt(y,m,v,d) 
 | Purpose  : Simulates multivariate normal values  
 | Arguments: y [REQ] = 1 Dim array with mv variables to populate
 |            m [REQ] = 1 Dim array with mv mean values
 |            v [REQ] = 2 Dim array with variance covariance matrix  
 |            d [REQ] = Degrees of freedom for MVT distribution
+|
+|
 ***********************************************************************************/;
 
 proc fcmp outlib = work.functions.mvd_tools;
 
-  subroutine sim_mvn(y[*],m[*],v[*,*]);   
+  ********************************************************************************;
+  *** MVN DISTRIBUTION RELATED FUNCTIONS AND CALL ROUTINES                     ***;
+  ********************************************************************************;
+
+  subroutine rand_mvn(y[*],m[*],v[*,*]);   
      outargs y;
      ydim1 = dim1(y); 
      mdim1 = dim1(m);
@@ -67,9 +97,82 @@ proc fcmp outlib = work.functions.mvd_tools;
        end;
      end;
   endsub;
+ 
+
+  function pdf_mvn(y[*],m[*],v[*,*]);
+    ydim1 = dim1(y); 
+    mdim1 = dim1(m); 
+    vdim1 = dim1(v);
+    vdim2 = dim2(v);
+    if not ( ydim1 = mdim1 = vdim1 = vdim2 ) then do;
+      msg1 = "ER"||upcase("ror:(FCMP):")||"The Function MVN_PDF does not have matching array sizes.";
+      msg2 = "ER"||upcase("ror:(FCMP): Dimensions:");
+      put msg1;
+      put msg2 udim1= odim1= odim2=;
+      pdf = .e;
+    end;
+    else do;
+
+      n = 0;
+      do ii = 1 to ydim1;
+        if y[ii] ne . then n = n + 1;
+      end;
+
+      if (n < ydim1) then do;
+        msg1 = "NO"||upcase("te:(FCMP):")||"Partially missing vectors supplied to function MVN_PDF.";
+        msg2 = "NO"||upcase("te:(FCMP):")||"PDF_MVN will return pdf values using vectors constructed with non missing values.");
+        put msg1;
+        put msg2 udim1= odim1= odim2=;
+      end;
+
+      array loc[1,1] / nosymbols;
+      call dynamic_array(loc,n,1);
+      jj = 0;
+      do ii = 1 to ydim1;
+        if y[ii] ne . then do;
+          jj = jj + 1;
+          loc[jj,1] = ii;
+	    end;
+	  end;
+
+      array dvec[1,1] / nosymbols;     
+      array vmat[1,1] / nosymbols;
+      array dtrs[1,1] / nosymbols;
+      array vinv[1,1] / nosymbols;
+      array vec1[1,1] / nosymbols;
+      array val1[1,1] / nosymbols;
+      call dynamic_array(dvec,n,1);
+      call dynamic_array(dtrs,1,n);
+      call dynamic_array(vmat,n,n);
+      call dynamic_array(vinv,n,n);   
+      call dynamic_array(vec1,n,1);  
+
+      do ii = 1 to n;
+        dvec[ii,1] = y[loc[ii,1]] - m[loc[ii,1]];
+        dtrs[1,ii] = dvec[ii,1];
+        do jj = 1 to n;
+          vmat[ii,jj] = v[loc[ii,1],loc[jj,1]];
+        end;
+      end;
+
+      call det(vmat,detv);
+      call inv(vmat,vinv);
+      call mult(vinv,dvec,vec1);
+      call mult(dtrs,vec1,val1);
+
+      pi  = arcos(-1);
+      pdf = ((2*pi)**(-n/2)) * ((detv)**(-1/2)) * exp(-0.5*val1[1,1]);
+
+    end;
+    return(pdf);
+  endsub; 
 
 
-  subroutine sim_mvt(y[*],m[*],v[*,*],d);   
+  ********************************************************************************;
+  *** MVT DISTRIBUTION RELATED FUNCTIONS AND CALL ROUTINES                     ***;
+  ********************************************************************************;
+
+  subroutine rand_mvt(y[*],m[*],v[*,*],d);   
      outargs y;
 
      ydim1 = dim1(y); 

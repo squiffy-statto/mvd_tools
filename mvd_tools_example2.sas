@@ -29,7 +29,7 @@ run;
 
 *** STANDARD EXAMPLE ***;
 data mvt_data2;
-   call streaminit(123456);
+   call streaminit(654321);
    array y[8] y1-y8;
    array m[8]   _temporary_ (1 2 3 4 5 6 7 8);
    array r[8,8] _temporary_ (1.00 0.90 0.80 0.70 0.60 0.50 0.40 0.30
@@ -40,9 +40,9 @@ data mvt_data2;
                              0.50 0.60 0.70 0.80 0.90 1.00 0.90 0.80 
                              0.40 0.50 0.60 0.70 0.80 0.90 1.00 0.90  
                              0.30 0.40 0.50 0.60 0.70 0.80 0.90 1.00);
-   df = 3;
+   df = 2;
 
-   do sim = 1 to 10000;
+   do sim = 1 to 100000;
      call sim_mvt(y,m,r,df);
      output;
    end;
