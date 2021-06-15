@@ -25,18 +25,6 @@
 |            m [REQ] = 1 Dim array with mv mean values
 |            v [REQ] = 2 Dim array with variance covariance matrix  
 |
-| Name     : cond_mu_mvn(y,m,v) 
-| Purpose  : Creates conditional mean vector for MVN.  
-| Arguments: y [REQ] = 1 Dim array with mv values to condition on
-|            m [REQ] = 1 Dim array with full mv mean values
-|            v [REQ] = 2 Dim array with full variance covariance matrix  
-|
-| Name     : cond_vc_mvn(y,m,v) 
-| Purpose  : Creates conditional vc matrix for MVN.  
-| Arguments: y [REQ] = 1 Dim array with mv values to condition on
-|            m [REQ] = 1 Dim array with full mv mean values
-|            v [REQ] = 2 Dim array with full variance covariance matrix  
-|
 |
 | Multivariate T Functions and Call Routines
 |-------------------------------------------
