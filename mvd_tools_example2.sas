@@ -21,7 +21,7 @@ data mvt_data1;
    df = 3;
 
    do sim = 1 to 10;
-     call sim_mvt(y,m,r,df);
+     call rand_mvt(y,m,r,df);
      output;
    end;
 run;
@@ -43,7 +43,7 @@ data mvt_data2;
    df = 2;
 
    do sim = 1 to 100000;
-     call sim_mvt(y,m,r,df);
+     call rand_mvt(y,m,r,df);
      output;
    end;
 run;

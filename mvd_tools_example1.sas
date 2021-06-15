@@ -22,7 +22,7 @@ data mvn_data1;
    array r[2,2] _temporary_ (1.00 2.00
                              2.00 1.00);
    do sim = 1 to 10;
-     call sim_mvn(y,m,r);
+     call rand_mvn(y,m,r);
      output;
    end;
 run;
@@ -41,7 +41,7 @@ data mvn_data2;
                              0.40 0.50 0.60 0.70 0.80 0.90 1.00 0.90  
                              0.30 0.40 0.50 0.60 0.70 0.80 0.90 1.00);
    do sim = 1 to 1000000;
-     call sim_mvn(y,m,r);
+     call rand_mvn(y,m,r);
      output;
    end;
 run;
